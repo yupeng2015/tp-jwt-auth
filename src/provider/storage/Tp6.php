@@ -23,4 +23,10 @@ class Tp6 implements Storage
     {
         return Cache::set($key, time(), $time);
     }
+
+    public function setValue($key, $value = '', $time = 0)
+    {
+        $value = $value ?: time();
+        return Cache::set($key, $value, $time);
+    }
 }

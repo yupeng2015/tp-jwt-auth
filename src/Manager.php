@@ -3,10 +3,12 @@
 namespace thans\jwt;
 
 use thans\jwt\exception\TokenBlacklistException;
+use thans\jwt\exception\TokenExpiredException;
 use thans\jwt\provider\JWT\Provider;
 
 class Manager
 {
+    protected $earlyExpiredList;
     protected $blacklist;
 
     protected $payload;
@@ -16,11 +18,13 @@ class Manager
     public function __construct(
         Blacklist $blacklist,
         Payload $payload,
-        Provider $provider
+        Provider $provider,
+        EarlyExpireList $earlyExpiredList
     ) {
         $this->blacklist = $blacklist;
         $this->payload   = $payload;
         $this->provider  = $provider;
+        $this->earlyExpiredList  = $earlyExpiredList;
     }
 
     /**
@@ -54,7 +58,17 @@ class Manager
         if ($this->validate($payload)) {
             throw new TokenBlacklistException('The token is in blacklist.');
         }
-        $this->payload->customer($payload)->check($this->refresh);
+        try {
+            $this->payload->customer($payload)->check($this->refresh);
+        }catch (TokenExpiredException $exception){
+            if(!$this->earlyExpiredList->has($payload)){
+                $this->earlyExpiredList->add($payload,time() + 10);
+            }
+            if($this->earlyExpiredList->get($payload) >= time()){
+                return $payload;
+            }
+            throw new $exception;
+        }
 
         return $payload;
     }

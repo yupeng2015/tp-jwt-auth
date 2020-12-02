@@ -37,6 +37,12 @@ class JWT
             new $this->config['blacklist_storage'],
         ]);
     }
+    protected function registerEarlyExpireList()
+    {
+        Container::getInstance()->make('thans\jwt\EarlyExpireList', [
+            new $this->config['early_expireList_storage'],
+        ]);
+    }
 
 
     protected function registerProvider()
@@ -79,6 +85,7 @@ class JWT
             Container::getInstance()->make('thans\jwt\Blacklist'),
             Container::getInstance()->make('thans\jwt\Payload'),
             Container::getInstance()->make('thans\jwt\provider\JWT\Lcobucci'),
+            Container::getInstance()->make('thans\jwt\EarlyExpireList')
         ]);
     }
 
