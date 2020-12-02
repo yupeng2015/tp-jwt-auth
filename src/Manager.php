@@ -51,7 +51,7 @@ class Manager
         $payload = $this->provider->decode($token->get());
 
         //blacklist verify
-        if ($this->validate($payload) && ($payload['exp']->getValue() + 2) < time()) {
+        if ($this->validate($payload)) {
             throw new TokenBlacklistException('The token is in blacklist.');
         }
         $this->payload->customer($payload)->check($this->refresh);
