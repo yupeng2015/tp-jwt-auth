@@ -16,4 +16,5 @@ return [
     //token获取方式，数组靠前值优先
     'token_mode'    => ['header', 'cookie', 'param'],
     'blacklist_storage' => thans\jwt\provider\storage\Tp5::class,
+    'delaylist_storage' => thans\jwt\provider\storage\Tp6::class,
 ];
