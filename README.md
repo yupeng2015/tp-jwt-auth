@@ -2,7 +2,7 @@
 <h1><p align="center">JWT-AUTH</p></h1>
 <p align="center"> thinkphp的jwt（JSON Web Token）身份验证包。支持Header、Cookie、Param等多种传参方式。包含：验证、验证并且自动刷新等多种中间件。</p>
 
-[thinkphp6.0的demo下载](https://gitee.com/thans/jwt-auth/attach_files/306748/download)
+**在原来基础上优化，支持token进入黑名单之后，延迟token的有效期，解决前端并发请求携带旧token导致的问题**
 
 ## 支持Swoole
 
@@ -81,6 +81,7 @@ token刷新说明：
 > token默认有效期为60秒，如果需要修改请修改env文件。
 > refresh_ttl为刷新token有效期参数，单位为分钟。默认有效期14天。
 > token过期后，旧token将会被加入黑名单。
+> token进入黑名单后有个延迟缓冲期，期间旧token仍可用，默认3秒
 > 如果需要自动刷新，请使用中间件  thans\jwt\middleware\JWTAuthAndRefresh::class,
 > 自动刷新后会通过header返回，请保存好。（注意，此中间件过期后第一次访问正常，第二次进入黑名单。）
 
@@ -106,14 +107,9 @@ token传参方式如下：
 
 ![image](https://thans.cn/Snipaste_2020-01-18_17-25-52.png)
 
-## 联系&打赏
-
-[打赏名单](SUPPORT.md)
-
-![image](https://thans.cn/others/thans.jpeg)
 
 ## 参考与借鉴
-
+thans
 https://github.com/tymondesigns/jwt-auth
 
 ## 感谢
@@ -122,6 +118,7 @@ https://github.com/tymondesigns/jwt-auth
 - php
 - lcobucci/jwt
 - thinkphp
+- thans
 
 ## 下一步
 

@@ -1,5 +1,5 @@
 {
-    "name": "thans/tp-jwt-auth",
+    "name": "soen/tp-jwt-auth",
     "description": "thinkphp  jwt auth composer",
     "type": "library",
     "require": {
