@@ -3,6 +3,7 @@
 namespace thans\jwt;
 
 use thans\jwt\exception\TokenBlacklistException;
+use thans\jwt\exception\TokenExpiredException;
 use thans\jwt\provider\JWT\Provider;
 
 class Manager
@@ -12,13 +13,18 @@ class Manager
     protected $payload;
 
     protected $refresh;
+    
+    protected $delayList;
 
     public function __construct(
         Blacklist $blacklist,
+        DelayList $delayList,
         Payload $payload,
         Provider $provider
+
     ) {
         $this->blacklist = $blacklist;
+        $this->delayList  = $delayList;
         $this->payload   = $payload;
         $this->provider  = $provider;
     }
@@ -49,13 +55,18 @@ class Manager
     public function decode(Token $token)
     {
         $payload = $this->provider->decode($token->get());
-
-        //blacklist verify
-        if ($this->validate($payload)) {
-            throw new TokenBlacklistException('The token is in blacklist.');
+        try {
+            $this->payload->customer($payload)->check($this->refresh);
+        } catch (TokenExpiredException $exception){
+            if($this->delayList->has($payload)){
+                return $payload;
+            }
+            //blacklist verify
+            if ($this->validate($payload)) {
+                throw new TokenBlacklistException('The token is in blacklist.');
+            }
+            throw $exception;
         }
-        $this->payload->customer($payload)->check($this->refresh);
-
         return $payload;
     }
 
@@ -71,7 +82,8 @@ class Manager
     {
         $this->setRefresh();
         $payload = $this->decode($token);
-
+        //延迟列表
+        $this->temporary($token);
         $this->invalidate($token);
 
         $this->payload->customer($payload)
@@ -92,6 +104,15 @@ class Manager
     {
         return $this->blacklist->add($this->provider->decode($token->get()));
     }
+
+    /**
+     * @return DelayList
+     */
+    public function temporary(Token $token){
+        return $this->delayList->add($this->provider->decode($token->get()));
+    }
+
+
 
     /**
      * 验证是否在黑名单

@@ -38,6 +38,13 @@ class JWT
         ]);
     }
 
+    protected function registerDelayList()
+    {
+        Container::getInstance()->make('thans\jwt\DelayList', [
+            new $this->config['delaylist_storage'],
+        ]);
+    }
+
 
     protected function registerProvider()
     {
@@ -77,6 +84,7 @@ class JWT
     {
         Container::getInstance()->make('thans\jwt\Manager', [
             Container::getInstance()->make('thans\jwt\Blacklist'),
+            Container::getInstance()->make('thans\jwt\DelayList'),
             Container::getInstance()->make('thans\jwt\Payload'),
             Container::getInstance()->make('thans\jwt\provider\JWT\Lcobucci'),
         ]);
@@ -84,27 +92,17 @@ class JWT
 
     protected function registerJWTAuth()
     {
-        $chains = [
-            'header' => new AuthHeader(),
-            'cookie' => new Cookie(),
-            'param'  => new Param()
-        ];
-
-        $mode = $this->config['token_mode'];
-        $setChain = [];
-
-        foreach ($mode as $key => $chain) {
-            if(isset($chains[$chain])){
-                $setChain[$key] = $chains[$chain];
-            }
-        }
-
-        JWTAuth::parser()->setRequest($this->request)->setChain($setChain);
+        JWTAuth::parser()->setRequest($this->request)->setChain([
+            new AuthHeader(),
+            new Cookie(),
+            new Param(),
+        ]);
     }
 
     public function init()
     {
         $this->registerBlacklist();
+        $this->registerDelayList();
         $this->registerProvider();
         $this->registerFactory();
         $this->registerPayload();
