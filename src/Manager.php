@@ -82,9 +82,9 @@ class Manager
     {
         $this->setRefresh();
         $payload = $this->decode($token);
+        $this->invalidate($token);
         //延迟列表
         $this->temporary($token);
-        $this->invalidate($token);
 
         $this->payload->customer($payload)
             ->check(true);
