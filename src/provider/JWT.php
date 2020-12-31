@@ -42,6 +42,7 @@ class JWT
     {
         Container::getInstance()->make('thans\jwt\DelayList', [
             new $this->config['delaylist_storage'],
+            $this->config['delay_ttl'],
         ]);
     }
 

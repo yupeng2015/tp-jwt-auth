@@ -8,16 +8,18 @@ class DelayList
 {
     protected $test = '';
     protected $delayKey = 'jwt_delay_';
+    protected $delayTime = '3';
     protected $storage;
 
-    public function __construct(Storage $storage)
+    public function __construct(Storage $storage, int $delayTime)
     {
         $this->storage = $storage;
+        $this->delayTime = $delayTime;
     }
 
     public function add($payload)
     {
-        $this->set($this->getKey($payload));
+        $this->set($this->getKey($payload), );
 
         return $this;
     }
@@ -32,7 +34,7 @@ class DelayList
         return $payload['jti']->getValue();
     }
 
-    public function set($key, $time = 5)
+    public function set($key, $time = 0)
     {
         $this->storage->set($this->delayKey . $key, $time);
 
