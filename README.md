@@ -109,7 +109,6 @@ token传参方式如下：
 
 
 ## 参考与借鉴
-thans
 https://github.com/tymondesigns/jwt-auth
 
 ## 感谢
